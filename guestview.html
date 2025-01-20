@@ -89,6 +89,7 @@
     function loadEvent() {
         const eventName = document.getElementById("eventNameInput").value.trim().toLowerCase();
         const eventsData = JSON.parse(localStorage.getItem("eventsData"));
+        console.log('eventsData: ', eventsData);
         const tablesContainer = document.getElementById("tablesContainer");
         const eventSearchContainer = document.getElementById("eventSearchContainer");
         const guestSearchContainer = document.getElementById("guestSearchContainer");

@@ -156,18 +156,39 @@
             return;
         }
 
+    // Save to localStorage
+    try {
+        localStorage.setItem("eventsData", JSON.stringify(eventsData));
+        console.log("Data saved to localStorage.");
+    } catch (error) {
+        alert("Failed to save data to localStorage.");
+        console.error(error);
+        return;
+    }
+
+    // Send to the server
         fetch('/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ eventName: currentEvent, eventData: eventsData[currentEvent] }),
         })
-            .then(response => response.ok ? alert("Data saved successfully!") : alert("Failed to save data."))
-            .catch(() => alert("Error connecting to the server."));
-    }
+        .then(response => {
+            if (response.ok) {
+                alert("Data saved successfully!");
+            } else {
+                alert("Failed to save data");
+            }
+        })
+        .catch(() => {
+            alert("Error connecting to the server.");
+        });
+}
+
 
     function generateEventURL() {
         if (currentEvent) {
             const baseURL = window.location.origin + "/guestview.html";
+            console.log('baseURL: ', baseURL);
             const eventURL = `${baseURL}?event=${encodeURIComponent(currentEvent)}`;
             alert(`Shareable URL for the event: ${eventURL}`);
         } else {

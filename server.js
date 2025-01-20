@@ -5,9 +5,24 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000;
 const DATA_FILE = './eventsData.json';
+const path = require('path');
 
 // Middleware
 app.use(bodyParser.json());
+
+
+
+// Serve static files from the root directory
+app.use(express.static(__dirname));
+
+// Routes to serve HTML files
+app.get('/guestview.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'guestview.html'));
+});
+
+app.get('/newadmin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'newadmin.html'));
+});
 
 // Helper functions
 const readData = () => (fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE)) : {});

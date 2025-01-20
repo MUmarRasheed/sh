@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        .event-search {
+            margin: 20px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+        .event-search input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .tables-container {
+            width: 80%;
+            max-width: 1000px;
+            margin-top: 20px;
+        }
+        .table-section {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .table-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .guest-list {
+            list-style: none;
+            padding: 0;
+        }
+        .guest-item {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        .guest-search {
+            margin: 20px 0;
+            width: 100%;
+            max-width: 400px;
+        }
+        .guest-search input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h1>Guest View - Event Tables</h1>
+<div id="eventSearchContainer" class="event-search" style="display: block;">
+    <input type="text" id="eventNameInput" placeholder="Enter event name" onkeydown="if(event.key==='Enter') loadEvent()">
+    <button onclick="loadEvent()">Search Event</button>
+</div>
+<div id="guestSearchContainer" class="guest-search" style="display: none;">
+    <input type="text" id="guestSearchInput" placeholder="Search for a guest..." oninput="filterGuests()">
+</div>
+<div id="tablesContainer" class="tables-container"></div>
+
+<script>
+    function loadEvent() {
+        const eventName = document.getElementById("eventNameInput").value.trim().toLowerCase();
+        const eventsData = JSON.parse(localStorage.getItem("eventsData"));
+        const tablesContainer = document.getElementById("tablesContainer");
+        const eventSearchContainer = document.getElementById("eventSearchContainer");
+        const guestSearchContainer = document.getElementById("guestSearchContainer");
+        tablesContainer.innerHTML = ""; // Clear previous content
+
+        if (!eventName) {
+            alert("Please enter an event name.");
+            return;
+        }
+
+        if (eventsData) {
+            const eventKey = Object.keys(eventsData).find(key => key.toLowerCase() === eventName);
+            if (eventKey) {
+                const event = eventsData[eventKey];
+
+                // Hide the event search bar when an event is successfully found
+                eventSearchContainer.style.display = "none";
+
+                // Display guest search bar
+                guestSearchContainer.style.display = "block";
+
+                // Display event title
+                const titleElement = document.createElement("h2");
+                titleElement.textContent = event.title || `Event: ${eventKey}`;
+                tablesContainer.appendChild(titleElement);
+
+                // Display head table if exists
+                if (event.headTable && event.headTable.length > 0) {
+                    const headTableSection = document.createElement("div");
+                    headTableSection.classList.add("table-section");
+                    headTableSection.setAttribute("data-table-id", "head");
+                    headTableSection.innerHTML = `
+                        <div class="table-number">Head Table</div>
+                        <ul class="guest-list">
+                            ${event.headTable.map(guest => `<li class="guest-item">${guest}</li>`).join("")}
+                        </ul>
+                    `;
+                    tablesContainer.appendChild(headTableSection);
+                }
+
+                // Display regular tables
+                event.tables.forEach(table => {
+                    const tableSection = document.createElement("div");
+                    tableSection.classList.add("table-section");
+                    tableSection.setAttribute("data-table-id", table.id);
+                    tableSection.innerHTML = `
+                        <div class="table-number">Table ${table.id}</div>
+                        <ul class="guest-list">
+                            ${table.guests.map(guest => `<li class="guest-item">${guest}</li>`).join("")}
+                        </ul>
+                    `;
+                    tablesContainer.appendChild(tableSection);
+                });
+
+                return;
+            }
+        }
+
+        alert("Event not found. Please check the event name.");
+    }
+
+    function filterGuests() {
+        const searchInput = document.getElementById("guestSearchInput").value.toLowerCase();
+        const tableSections = document.querySelectorAll(".table-section");
+
+        tableSections.forEach(table => {
+            const guestItems = table.querySelectorAll(".guest-item");
+            let tableHasGuest = false;
+
+            guestItems.forEach(item => {
+                const guestName = item.textContent.toLowerCase();
+                if (guestName.includes(searchInput)) {
+                    item.style.display = "";
+                    tableHasGuest = true;
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            // Show or hide the entire table based on whether it has a matching guest
+            table.style.display = tableHasGuest ? "block" : "none";
+        });
+    }
+
+    function getURLParameter(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    window.onload = function () {
+        const eventName = getURLParameter("event");
+        if (eventName) {
+            document.getElementById("eventNameInput").value = eventName;
+            loadEvent();
+        }
+    };
+</script>
+
+</body>
+</html>

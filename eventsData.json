@@ -1,0 +1,30 @@
+{
+    "Birthday Party": {
+        "title": "John's 30th Birthday",
+        "headTable": ["John Doe", "Jane Doe"],
+        "tables": [
+            {
+                "id": 1,
+                "guests": ["Alice", "Bob", "Charlie"]
+            },
+            {
+                "id": 2,
+                "guests": ["David", "Eve", "Frank"]
+            }
+        ]
+    },
+    "Wedding Reception": {
+        "title": "Mark and Sarah's Wedding",
+        "headTable": ["Mark", "Sarah", "Best Man", "Maid of Honor"],
+        "tables": [
+            {
+                "id": 1,
+                "guests": ["Guest 1", "Guest 2", "Guest 3"]
+            },
+            {
+                "id": 2,
+                "guests": ["Guest 4", "Guest 5", "Guest 6"]
+            }
+        ]
+    }
+}
